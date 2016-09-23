@@ -1,0 +1,30 @@
+{
+  "name": "notes",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "handlebars-loader": "^1.4.0",
+    "loader-utils": "^0.2.16",
+    "webpack": "^2.1.0-beta.25"
+  },
+  "bin": {
+    "notes": "app.bundle.js"
+  },
+  "dependencies": {
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "handlebars": "^4.0.5",
+    "handlebars-loader": "^1.4.0",
+    "webpack": "^2.1.0-beta.25"
+  },
+  "description": ""
+}
