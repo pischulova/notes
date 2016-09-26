@@ -1,8 +1,8 @@
 import BaseView from '../BaseView';
 
 export default class Popup extends BaseView {
-	constructor() {
-		super(require('./popup.handlebars'));
+	constructor(parent) {
+		super(parent);
 	}
 
 	render() {

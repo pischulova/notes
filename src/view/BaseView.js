@@ -1,10 +1,11 @@
 export default class BaseView {
-	constructor(template) {
-		this.template = template;
+	constructor(parent, content) {
+		var className = this.constructor.name.toLowerCase(),
+		    template = require(`./${className}/${className}.handlebars`);
 
 		var div = document.createElement('div');
-		div.innerHTML = template();
-		document.body.appendChild(div);
+		div.innerHTML = template(content);
+		parent.appendChild(div);
 
 		this.render();
 	}

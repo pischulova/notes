@@ -1,41 +1,41 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// identity function for calling harmory imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-
+/******/
 /******/ 	// define getter function for harmory exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		Object.defineProperty(exports, name, {
@@ -44,7 +44,7 @@
 /******/ 			get: getter
 /******/ 		});
 /******/ 	};
-
+/******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -53,15 +53,15 @@
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-
+/******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -244,7 +244,7 @@ module.exports = exports['default'];
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 'use strict';
@@ -255,14 +255,15 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var BaseView = function BaseView(template) {
+var BaseView = function BaseView(parent, content) {
 	_classCallCheck(this, BaseView);
 
-	this.template = template;
+	var className = this.constructor.name.toLowerCase(),
+	    template = __webpack_require__(29)("./" + className + '/' + className + '.handlebars');
 
 	var div = document.createElement('div');
-	div.innerHTML = template();
-	document.body.appendChild(div);
+	div.innerHTML = template(content);
+	parent.appendChild(div);
 
 	this.render();
 };
@@ -271,6 +272,15 @@ exports.default = BaseView;
 
 /***/ },
 /* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+// Create a simple path alias to allow browserify to resolve
+// the runtime on a supported path.
+module.exports = __webpack_require__(13)['default'];
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -288,11 +298,11 @@ var _exception = __webpack_require__(1);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _helpers = __webpack_require__(13);
+var _helpers = __webpack_require__(16);
 
-var _decorators = __webpack_require__(11);
+var _decorators = __webpack_require__(14);
 
-var _logger = __webpack_require__(21);
+var _logger = __webpack_require__(24);
 
 var _logger2 = _interopRequireDefault(_logger);
 
@@ -381,15 +391,6 @@ exports.logger = _logger2['default'];
 
 
 /***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-// Create a simple path alias to allow browserify to resolve
-// the runtime on a supported path.
-module.exports = __webpack_require__(10)['default'];
-
-
-/***/ },
 /* 5 */
 /***/ function(module, exports) {
 
@@ -409,57 +410,82 @@ var dbName = 'notesDB';
 var IndexedDB = function () {
 	function IndexedDB() {
 		_classCallCheck(this, IndexedDB);
-
-		// indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-		// IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction || {READ_WRITE: "readwrite"};
-		// IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
-		var db, noteObjStore;
-
-		var request = indexedDB.open(dbName, 1);
-		request.onerror = function (event) {
-			console.log('Database error: ' + event.target.errorCode);
-		};
-		request.onsuccess = function (event) {
-			db = this.result;
-			console.log("openDb DONE in onsuccess");
-		};
-
-		request.onupgradeneeded = function (event) {
-			db = this.result;
-			console.log("in onupgradeneeded: openDb DONE");
-			noteObjStore = db.createObjectStore('notes', { autoIncrement: true });
-			console.log("in onupgradeneeded: noteObjStore created");
-
-			var date = new Date().toISOString();
-
-			var temp = [{
-				title: 'Even working',
-				text: 'Even working is a term used in book publishing that means the number of pages in a book is divisible by the number 16 or 32.[1] A book with 256, 272 or 288 pages, for instance, is an "even working", whilst a book with 254 or 286 pages is not. The significance of 16 or 32, which form the individual "signatures" of which a book is composed, is that they make the most efficient use of the paper used in the printing of a book.[1] If the number of printed pages in a book is, for example, 258, then the editor will attempt to move material from the two extra pages so that there will not be 14 blank pages at the end of the book (the next even working after 256 being 272 pages).',
-				date: date
-			}, {
-				title: 'Weightlifting',
-				text: "Weightlifting at the 1988 Summer Olympics – Men +110 kg. The men 60 kg weightlifting event was the heaviest events at the weightlifting competition of the 1988 Summer Olympics, with competitors required to have a minimum of 110 kilograms of body mass. The competition took place on September 29, and participants were divided in two groups. Each lifter performed in both the snatch and clean and jerk lifts, with the final score being the sum of the lifter's best result in each. The athlete received three attempts in each of the two lifts; the score for the lift was the heaviest weight successfully lifted.",
-				date: date
-			}, {
-				title: 'Obannapalem, India',
-				text: "Obannapalem is a Village in Naguluppalapadu, Mandal in Prakasam District of Andhra Pradesh State, India. It belongs to Andhra region . It is located 19 km towards North from District headquarters Ongole. 140 km from State capital Amaravathi. Obannapalem contains people with different castes. But majority of people came from Kamma community and having Polineni,Mandava and Katta surnames. It has nice ancient temples of Ramalayam and Hanuman which are restored. Apart from that there is Sivalayam. Obannapalem lies on near by Andhra Pradesh State Highway 214A and has connectivity to towns and cities through regular buses.This village is near to Naguluppalapadu.",
-				date: date
-			}, {
-				title: 'Hilton',
-				text: "Hilton is a village and civil parish in the county of Dorset in southern England. It is sited at an altitude of 135 metres in a small valley which drains chalk hills in the eastern part of the Dorset Downs. It lies within the North Dorset administrative district, approximately 8 miles (13 km) west-south-west of the town of Blandford Forum. The summit of Bulbarrow Hill (274 metres) is 1.5 miles (2.4 km) north of the village. In the 2011 census the parish—which includes the settlement of Ansty to the west—had 231 dwellings, 206 households and a population of 477. Hilton used to form a part of the estate of the nearby Milton Abbey when it was owned by the rich Hambro family; the Hambros, who often used to entertain Edward VII, planted woods on the surrounding hills, to provide cover for pheasants.[3] However the woods surrounding Hilton today are mostly post-war plantations of beech (Fagus sylvatica) and ash (Fraxinus excelsior) as the hills were cleared during WW2. Large areas are privately owned, although there are open access areas owned and managed by the Forestry Commission.",
-				date: date
-			}];
-
-			temp.forEach(function (note) {
-				noteObjStore.add(note);
-			});
-		};
 	}
 
 	_createClass(IndexedDB, [{
+		key: 'openDb',
+		value: function openDb() {
+			var instance = this,
+			    db,
+			    noteObjStore,
+			    request = indexedDB.open(dbName, 1);
+
+			return new Promise(function (resolve, reject) {
+
+				request.onerror = function () {
+					console.log('Database error: ' + this.errorCode);
+					reject();
+				};
+				request.onsuccess = function () {
+					instance.db = this.result;
+					resolve();
+				};
+				request.onupgradeneeded = function () {
+					db = this.result;
+					noteObjStore = db.createObjectStore('notes', { autoIncrement: true });
+
+					var date = new Date().toISOString();
+
+					var temp = [{
+						title: 'Even working',
+						text: 'Even working is a term used in book publishing that means the number of pages in a book is divisible by the number 16 or 32.[1] A book with 256, 272 or 288 pages, for instance, is an "even working", whilst a book with 254 or 286 pages is not. The significance of 16 or 32, which form the individual "signatures" of which a book is composed, is that they make the most efficient use of the paper used in the printing of a book.[1] If the number of printed pages in a book is, for example, 258, then the editor will attempt to move material from the two extra pages so that there will not be 14 blank pages at the end of the book (the next even working after 256 being 272 pages).',
+						date: date
+					}, {
+						title: 'Weightlifting',
+						text: "Weightlifting at the 1988 Summer Olympics – Men +110 kg. The men 60 kg weightlifting event was the heaviest events at the weightlifting competition of the 1988 Summer Olympics, with competitors required to have a minimum of 110 kilograms of body mass. The competition took place on September 29, and participants were divided in two groups. Each lifter performed in both the snatch and clean and jerk lifts, with the final score being the sum of the lifter's best result in each. The athlete received three attempts in each of the two lifts; the score for the lift was the heaviest weight successfully lifted.",
+						date: date
+					}, {
+						title: 'Obannapalem, India',
+						text: "Obannapalem is a Village in Naguluppalapadu, Mandal in Prakasam District of Andhra Pradesh State, India. It belongs to Andhra region . It is located 19 km towards North from District headquarters Ongole. 140 km from State capital Amaravathi. Obannapalem contains people with different castes. But majority of people came from Kamma community and having Polineni,Mandava and Katta surnames. It has nice ancient temples of Ramalayam and Hanuman which are restored. Apart from that there is Sivalayam. Obannapalem lies on near by Andhra Pradesh State Highway 214A and has connectivity to towns and cities through regular buses.This village is near to Naguluppalapadu.",
+						date: date
+					}, {
+						title: 'Hilton',
+						text: "Hilton is a village and civil parish in the county of Dorset in southern England. It is sited at an altitude of 135 metres in a small valley which drains chalk hills in the eastern part of the Dorset Downs. It lies within the North Dorset administrative district, approximately 8 miles (13 km) west-south-west of the town of Blandford Forum. The summit of Bulbarrow Hill (274 metres) is 1.5 miles (2.4 km) north of the village. In the 2011 census the parish—which includes the settlement of Ansty to the west—had 231 dwellings, 206 households and a population of 477. Hilton used to form a part of the estate of the nearby Milton Abbey when it was owned by the rich Hambro family; the Hambros, who often used to entertain Edward VII, planted woods on the surrounding hills, to provide cover for pheasants.[3] However the woods surrounding Hilton today are mostly post-war plantations of beech (Fagus sylvatica) and ash (Fraxinus excelsior) as the hills were cleared during WW2. Large areas are privately owned, although there are open access areas owned and managed by the Forestry Commission.",
+						date: date
+					}];
+					temp.forEach(function (note) {
+						noteObjStore.add(note);
+					});
+				};
+			});
+		}
+
+		// getObjectStore(store_name, mode) {
+		//    	var tx = this.db.transaction(store_name, mode);
+		//    	return tx.objectStore(store_name);
+		//  	}
+
+	}, {
 		key: 'getAllNotes',
 		value: function getAllNotes() {
-			// use cursor
+			var notesList = [],
+			    transaction = this.db.transaction('notes', 'readonly'),
+			    store = transaction.objectStore('notes');
+
+			return new Promise(function (resolve) {
+				store.openCursor().onsuccess = function () {
+					var current = this.result;
+					if (current) {
+						console.log('Note ' + current.key + ': ' + current.value.title);
+						notesList.push(current.value);
+						current.continue();
+					}
+				};
+
+				transaction.oncomplete = function () {
+					resolve(notesList);
+				};
+			});
 		}
 	}, {
 		key: 'createNote',
@@ -494,7 +520,7 @@ var _BaseView2 = __webpack_require__(2);
 
 var _BaseView3 = _interopRequireDefault(_BaseView2);
 
-var _popup = __webpack_require__(7);
+var _popup = __webpack_require__(8);
 
 var _popup2 = _interopRequireDefault(_popup);
 
@@ -509,17 +535,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Header = function (_BaseView) {
 	_inherits(Header, _BaseView);
 
-	function Header() {
+	function Header(parent) {
 		_classCallCheck(this, Header);
 
-		return _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, __webpack_require__(8)));
+		return _possibleConstructorReturn(this, (Header.__proto__ || Object.getPrototypeOf(Header)).call(this, parent));
 	}
 
 	_createClass(Header, [{
 		key: 'render',
 		value: function render() {
 			document.querySelector('.add-btn').addEventListener('click', function () {
-				var popup = new _popup2.default();
+				var popup = new _popup2.default(document.body);
 			});
 		}
 	}]);
@@ -554,13 +580,57 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var NoteContainer = function (_BaseView) {
+	_inherits(NoteContainer, _BaseView);
+
+	function NoteContainer(parent, content) {
+		_classCallCheck(this, NoteContainer);
+
+		return _possibleConstructorReturn(this, (NoteContainer.__proto__ || Object.getPrototypeOf(NoteContainer)).call(this, parent, { hello: 'hurray!', notes: content }));
+	}
+
+	_createClass(NoteContainer, [{
+		key: 'render',
+		value: function render() {}
+	}]);
+
+	return NoteContainer;
+}(_BaseView3.default);
+
+exports.default = NoteContainer;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _BaseView2 = __webpack_require__(2);
+
+var _BaseView3 = _interopRequireDefault(_BaseView2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 var Popup = function (_BaseView) {
 	_inherits(Popup, _BaseView);
 
-	function Popup() {
+	function Popup(parent) {
 		_classCallCheck(this, Popup);
 
-		return _possibleConstructorReturn(this, (Popup.__proto__ || Object.getPrototypeOf(Popup)).call(this, __webpack_require__(9)));
+		return _possibleConstructorReturn(this, (Popup.__proto__ || Object.getPrototypeOf(Popup)).call(this, parent));
 	}
 
 	_createClass(Popup, [{
@@ -581,27 +651,56 @@ var Popup = function (_BaseView) {
 exports.default = Popup;
 
 /***/ },
-/* 8 */
+/* 9 */
+/***/ function(module, exports) {
+
+module.exports = function(){return "";};
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(4);
+var Handlebars = __webpack_require__(3);
 function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
 module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<div class='container'>\r\n	<div class='add-btn'>Add note</div>\r\n\r\n	<h1 class='logo'>\r\n		<a href='index.html'>NOTES</a>\r\n	</h1>\r\n	<div class='logo frame'>NOTES</div>\r\n\r\n	<nav class='nav'>\r\n		<ul> \r\n			<li>Archive</li>\r\n			<li>Login</li>\r\n			<li></li>\r\n		</ul>\r\n	</nav>	\r\n</div>\r\n";
 },"useData":true});
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-var Handlebars = __webpack_require__(4);
+var Handlebars = __webpack_require__(3);
+function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
+module.exports = (Handlebars["default"] || Handlebars).template({"1":function(container,depth0,helpers,partials,data) {
+    var helper;
+
+  return "\r\n	<div>\r\n	Note: \r\n	\r\n		<h1>"
+    + container.escapeExpression(((helper = (helper = helpers.title || (depth0 != null ? depth0.title : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"title","hash":{},"data":data}) : helper)))
+    + "</h1>\r\n	</div>\r\n";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, options, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", buffer = 
+  "	NOTES\r\n	"
+    + container.escapeExpression(((helper = (helper = helpers.hello || (depth0 != null ? depth0.hello : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"hello","hash":{},"data":data}) : helper)))
+    + "\r\n";
+  stack1 = ((helper = (helper = helpers.notes || (depth0 != null ? depth0.notes : depth0)) != null ? helper : alias2),(options={"name":"notes","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data}),(typeof helper === alias3 ? helper.call(alias1,options) : helper));
+  if (!helpers.notes) { stack1 = helpers.blockHelperMissing.call(depth0,stack1,options)}
+  if (stack1 != null) { buffer += stack1; }
+  return buffer;
+},"useData":true});
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+var Handlebars = __webpack_require__(3);
 function __default(obj) { return obj && (obj.__esModule ? obj["default"] : obj); }
 module.exports = (Handlebars["default"] || Handlebars).template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     return "<div class='popup'>\r\n	<div class='dark'></div>\r\n	<div class='note'>\r\n		<div class='exit'></div>\r\n		<input class='title' placeholder='Title' autofocus></input>\r\n		<textarea placeholder='Enter text here'></textarea>\r\n	</div>\r\n</div>\r\n";
 },"useData":true});
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -616,14 +715,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _handlebarsBase = __webpack_require__(3);
+var _handlebarsBase = __webpack_require__(4);
 
 var base = _interopRequireWildcard(_handlebarsBase);
 
 // Each of these augment the Handlebars object. No need to setup here.
 // (This is done to easily share code between commonjs and browse envs)
 
-var _handlebarsSafeString = __webpack_require__(24);
+var _handlebarsSafeString = __webpack_require__(27);
 
 var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
@@ -635,11 +734,11 @@ var _handlebarsUtils = __webpack_require__(0);
 
 var Utils = _interopRequireWildcard(_handlebarsUtils);
 
-var _handlebarsRuntime = __webpack_require__(23);
+var _handlebarsRuntime = __webpack_require__(26);
 
 var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-var _handlebarsNoConflict = __webpack_require__(22);
+var _handlebarsNoConflict = __webpack_require__(25);
 
 var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
@@ -674,7 +773,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -686,7 +785,7 @@ exports.registerDefaultDecorators = registerDefaultDecorators;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _decoratorsInline = __webpack_require__(12);
+var _decoratorsInline = __webpack_require__(15);
 
 var _decoratorsInline2 = _interopRequireDefault(_decoratorsInline);
 
@@ -697,7 +796,7 @@ function registerDefaultDecorators(instance) {
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -733,7 +832,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -745,31 +844,31 @@ exports.registerDefaultHelpers = registerDefaultHelpers;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _helpersBlockHelperMissing = __webpack_require__(14);
+var _helpersBlockHelperMissing = __webpack_require__(17);
 
 var _helpersBlockHelperMissing2 = _interopRequireDefault(_helpersBlockHelperMissing);
 
-var _helpersEach = __webpack_require__(15);
+var _helpersEach = __webpack_require__(18);
 
 var _helpersEach2 = _interopRequireDefault(_helpersEach);
 
-var _helpersHelperMissing = __webpack_require__(16);
+var _helpersHelperMissing = __webpack_require__(19);
 
 var _helpersHelperMissing2 = _interopRequireDefault(_helpersHelperMissing);
 
-var _helpersIf = __webpack_require__(17);
+var _helpersIf = __webpack_require__(20);
 
 var _helpersIf2 = _interopRequireDefault(_helpersIf);
 
-var _helpersLog = __webpack_require__(18);
+var _helpersLog = __webpack_require__(21);
 
 var _helpersLog2 = _interopRequireDefault(_helpersLog);
 
-var _helpersLookup = __webpack_require__(19);
+var _helpersLookup = __webpack_require__(22);
 
 var _helpersLookup2 = _interopRequireDefault(_helpersLookup);
 
-var _helpersWith = __webpack_require__(20);
+var _helpersWith = __webpack_require__(23);
 
 var _helpersWith2 = _interopRequireDefault(_helpersWith);
 
@@ -786,7 +885,7 @@ function registerDefaultHelpers(instance) {
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -832,7 +931,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -933,7 +1032,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -965,7 +1064,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1001,7 +1100,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1034,7 +1133,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1053,7 +1152,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1093,7 +1192,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1147,7 +1246,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1172,10 +1271,10 @@ exports['default'] = function (Handlebars) {
 module.exports = exports['default'];
 //# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uLy4uL2xpYi9oYW5kbGViYXJzL25vLWNvbmZsaWN0LmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7O3FCQUNlLFVBQVMsVUFBVSxFQUFFOztBQUVsQyxNQUFJLElBQUksR0FBRyxPQUFPLE1BQU0sS0FBSyxXQUFXLEdBQUcsTUFBTSxHQUFHLE1BQU07TUFDdEQsV0FBVyxHQUFHLElBQUksQ0FBQyxVQUFVLENBQUM7O0FBRWxDLFlBQVUsQ0FBQyxVQUFVLEdBQUcsWUFBVztBQUNqQyxRQUFJLElBQUksQ0FBQyxVQUFVLEtBQUssVUFBVSxFQUFFO0FBQ2xDLFVBQUksQ0FBQyxVQUFVLEdBQUcsV0FBVyxDQUFDO0tBQy9CO0FBQ0QsV0FBTyxVQUFVLENBQUM7R0FDbkIsQ0FBQztDQUNIIiwiZmlsZSI6Im5vLWNvbmZsaWN0LmpzIiwic291cmNlc0NvbnRlbnQiOlsiLyogZ2xvYmFsIHdpbmRvdyAqL1xuZXhwb3J0IGRlZmF1bHQgZnVuY3Rpb24oSGFuZGxlYmFycykge1xuICAvKiBpc3RhbmJ1bCBpZ25vcmUgbmV4dCAqL1xuICBsZXQgcm9vdCA9IHR5cGVvZiBnbG9iYWwgIT09ICd1bmRlZmluZWQnID8gZ2xvYmFsIDogd2luZG93LFxuICAgICAgJEhhbmRsZWJhcnMgPSByb290LkhhbmRsZWJhcnM7XG4gIC8qIGlzdGFuYnVsIGlnbm9yZSBuZXh0ICovXG4gIEhhbmRsZWJhcnMubm9Db25mbGljdCA9IGZ1bmN0aW9uKCkge1xuICAgIGlmIChyb290LkhhbmRsZWJhcnMgPT09IEhhbmRsZWJhcnMpIHtcbiAgICAgIHJvb3QuSGFuZGxlYmFycyA9ICRIYW5kbGViYXJzO1xuICAgIH1cbiAgICByZXR1cm4gSGFuZGxlYmFycztcbiAgfTtcbn1cbiJdfQ==
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(28)))
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1204,7 +1303,7 @@ var _exception = __webpack_require__(1);
 
 var _exception2 = _interopRequireDefault(_exception);
 
-var _base = __webpack_require__(3);
+var _base = __webpack_require__(4);
 
 function checkRevision(compilerInfo) {
   var compilerRevision = compilerInfo && compilerInfo[0] || 1,
@@ -1474,7 +1573,7 @@ function executeDecorators(fn, prog, container, depths, data, blockParams) {
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports) {
 
 "use strict";
@@ -1496,7 +1595,7 @@ module.exports = exports['default'];
 
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports) {
 
 var g;
@@ -1521,15 +1620,46 @@ module.exports = g;
 
 
 /***/ },
-/* 26 */
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+var map = {
+	"./footer/footer.handlebars": 9,
+	"./header/header.handlebars": 10,
+	"./notecontainer/notecontainer.handlebars": 11,
+	"./popup/popup.handlebars": 12
+};
+function webpackContext(req) {
+	return __webpack_require__(webpackContextResolve(req));
+};
+function webpackContextResolve(req) {
+	var id = map[req];
+	if(!(id + 1)) // check for number
+		throw new Error("Cannot find module '" + req + "'.");
+	return id;
+};
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = 29;
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 'use strict';
 
-var _header = __webpack_require__(6);
+var _Header = __webpack_require__(6);
 
-var _header2 = _interopRequireDefault(_header);
+var _Header2 = _interopRequireDefault(_Header);
+
+var _NoteContainer = __webpack_require__(7);
+
+var _NoteContainer2 = _interopRequireDefault(_NoteContainer);
 
 var _IndexedDBModule = __webpack_require__(5);
 
@@ -1537,9 +1667,19 @@ var _IndexedDBModule2 = _interopRequireDefault(_IndexedDBModule);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var header = new _header2.default();
+var header = new _Header2.default(document.body);
 
-var db = new _IndexedDBModule2.default();
+var indexedDB = new _IndexedDBModule2.default(),
+    notes,
+    noteContainer,
+    openedDB = indexedDB.openDb();
+
+openedDB.then(function () {
+	return indexedDB.getAllNotes();
+}).then(function (notes) {
+	noteContainer = new _NoteContainer2.default(document.body, notes);
+});
 
 /***/ }
 /******/ ]);
+//# sourceMappingURL=app.bundle.js.map
